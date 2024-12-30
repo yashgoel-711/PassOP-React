@@ -5,19 +5,20 @@ import { useRef, useEffect, useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import { Slide, Zoom, Flip, Bounce } from 'react-toastify';
 
-
+import { v4 as uuidv4 } from 'uuid';
 // define "lord-icon" custom element with default properties
 defineElement(lottie.loadAnimation);
 
 const Body = () => {
   const ref = useRef();
-  const ref2 = useRef();
+  
   const [Profiles, setProfiles] = useState([])
 
   const [Profile, setProfile] = useState({
     url: '',
     username: '',
-    password: ''
+    password: '',
+    id : uuidv4()
   })
 
   useEffect(() => {
@@ -39,7 +40,8 @@ const Body = () => {
     setProfile({
       url: '',
       username: '',
-      password: ''
+      password: '',
+      id : uuidv4()
     })
     localStorage.setItem("Profiles", JSON.stringify(updatedProfiles));
   }
@@ -59,6 +61,27 @@ const Body = () => {
     navigator.clipboard.writeText(text);
 
   }
+var flag = 0
+  const handleDelete = (index) => {
+    let confirm = true
+   if(flag == 0){ 
+     confirm = window.confirm('Are you sure you want to delete this Credential?');
+    flag = 0
+    
+  }
+    if (confirm) {
+      const updatedProfiles = Profiles.filter((profile, i) => i !== index);
+      setProfiles(updatedProfiles);
+      localStorage.setItem("Profiles", JSON.stringify(updatedProfiles));
+    }
+  }
+
+  const handleEdit = (index) => {
+    const EditProfile = Profiles.filter((profile, i) => i == index);
+    setProfile(EditProfile[0]);
+    flag = 1
+    handleDelete(index);
+  }
 
   const showPassword = () => {
     if (ref.current.state.includes('hover-searching')) {
@@ -75,7 +98,7 @@ const Body = () => {
     }
   }
   return (
-    <div className='md:w-[60vw] mx-auto min-h-[60vh] bg-[#efcdff17] rounded-lg mt-10 p-10'>
+    <div className='md:w-[60vw] mx-auto min-h-[60vh] bg-[#efcdff17] rounded-lg mt-10 md:p-10 p-4'>
       <ToastContainer
         position="bottom-right"
         autoClose={5000}
@@ -100,7 +123,7 @@ const Body = () => {
 
 
           <input onChange={handleChange} type="Password" value={Profile.password} className='outline-none  border-2 border-blue-500 focus:ring-2 focus:ring-green-500 rounded-full px-3 md:w-1/2' placeholder='Enter Password' name="password" id="inp-pass" required />
-          <span className='right-[-8px] top-[-7px] absolute cursor-pointer' onClick={showPassword}>
+          <span className='right-[-8px] top-[-7px] absolute cursor-pointer' onClick={() => { showPassword() }} >
             <lord-icon ref={ref} src="/src/assets/icons/eye-blink.json" trigger="loop" delay="1000" state="hover-blink" style={{ width: "100px", height: "45px" }}></lord-icon>
           </span>
 
@@ -109,7 +132,7 @@ const Body = () => {
         <div className='flex justify-center '>
           <button onClick={handleAdd} className=' flex items-center px-3 py-1 rounded-full gap-2 bg-black hover:text-violet-500'>
             <lord-icon trigger="morph" src="/src/assets/icons/folder.json"></lord-icon>
-            <h1 className='text-green-500'>Add Password</h1>
+            <h1 className='text-green-500'>Save Credentials</h1>
           </button>
         </div>
 
@@ -120,20 +143,24 @@ const Body = () => {
       </div>
 
 
-      <div className="profiles w-[90%] mt-8">
+      <div className="profiles md:w-[90%] mt-8">
 
 
         <table className='border-2 border-green-500 text-center table-fixed w-full mx-auto bg-gradient-to-r from-slate-800 to-slate-900 text-white '>
-                <tr>
+               <thead>
+               <tr>
                   <th>Site</th>
                   <th>Username</th>
                   <th>Password</th>
                   <th>Actions</th>
                 </tr>
-          {Profiles.map((profile) => {
+               </thead>
+               <tbody >
+          {Profiles.map((profile,index) => {
             return (
               <>
-                <tr>
+               
+             <tr key={profile.id} >
                   <td className='break-words border-2 border-green-500 '>
                     <a target='_blank' href={profile.url}><h1 className='p-4 '>{profile.url}</h1></a>
                     <div className="cursor-pointer">
@@ -152,14 +179,22 @@ const Body = () => {
                       <lord-icon onClick={() => { handleCopy(profile.password) }} src="/src/assets/icons/copy.json" trigger="hover" state="hover-slide" ></lord-icon>
                     </div>
                   </td>
-                  <td className='break-words border-2 border-green-500 '>
-                      <lord-icon onClick={() => { handleCopy(profile.password) }} src="/src/assets/icons/edit.json" trigger="loop" state="hover-circle" ></lord-icon>
+                  <td className=' border-2 border-green-500 '>
+                    <div className='flex justify-center md:gap-6 sm:gap-[12px] '>
+                    <div className='cursor-pointer w-fit'>
+                      <lord-icon onClick={() => { handleEdit(index) }} src="/src/assets/icons/edit.json" trigger="loop" state="hover-circle" ></lord-icon>
+                    </div>
+                      <div className='cursor-pointer w-fit '>
+                        <lord-icon onClick={ () => { handleDelete(index)  } } src="/src/assets/icons/delete.json" trigger="morph" state="morph-trash-in" ></lord-icon>
+                      </div>
+                    </div>
                     
                   </td>
                 </tr>
               </>
             )
           })}
+          </tbody>
         </table>
       </div>
 
