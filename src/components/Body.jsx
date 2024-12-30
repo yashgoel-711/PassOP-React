@@ -8,6 +8,7 @@ defineElement(lottie.loadAnimation);
 
 const Body = () => {
   const ref = useRef();  
+  const ref2 = useRef();
   const [Profiles, setProfiles] = useState([])
   
   const [Profile, setProfile] = useState({
@@ -38,6 +39,10 @@ const Body = () => {
       password: ''
     }) 
     localStorage.setItem("Profiles", JSON.stringify(updatedProfiles));
+  }
+  const handleCopy = () => {
+    navigator.clipboard.writeText(ref2.current.parentElement.innerText);
+    
   }
 
   const showPassword = () => {
@@ -85,27 +90,42 @@ const Body = () => {
         <h1 className='bg-gradient-to-r from-indigo-500 w-[30%] h-[1.9px] '></h1>
       </div>
 
-      <div>
-        <div className="profiles mt-8 mx-auto">
-          <div className='border-1 overflow-hidden border-green-500 rounded-md w-fit p-1 mx-auto'>
+      
+        <div className="profiles w-[90%] mt-8">
+         
 
-          <table className='w-[100%] bg-gradient-to-r from-slate-800 to-slate-900 text-white '>
+          <table className='text-center table-fixed w-full mx-auto bg-gradient-to-r from-slate-800 to-slate-900 text-white '>
             {Profiles.map((profile) => {
               return (
                 <>
               <tr>  
-                <td className='p-2 border-2 border-green-500 '><a target='_blank' href={profile.url}>{profile.url}</a></td>
-                <td className='p-2 border-2 border-green-500'>{profile.username}</td>
-                <td className='p-2 border-2 border-green-500'>{profile.password}</td>
+                <td className='break-words border-2 border-green-500 relative'>
+                  <div className="">
+                  <a target='_blank' href={profile.url}><h1 className='p-4 '>{profile.url}</h1></a>
+                  <lord-icon  ref={ref2} onClick={handleCopy} src="/src/assets/icons/copy.json" trigger="hover"  state="hover-slide" ></lord-icon>
+                  </div>
+                </td>
+                <td className='break-words border-2 border-green-500 relative'>
+                  <div  className="">
+                  <h1  className='p-4'>{profile.username}</h1>
+                  <lord-icon  ref={ref2} onClick={handleCopy} src="/src/assets/icons/copy.json" trigger="hover"  state="hover-slide" ></lord-icon>
+                  </div>
+                  </td>
+                <td className='break-words border-2 border-green-500 relative'>
+                  <div  className="">
+                  <h1  className='p-4'>{profile.password}</h1>
+                  <lord-icon  ref={ref2} onClick={handleCopy} src="/src/assets/icons/copy.json" trigger="hover"  state="hover-slide" ></lord-icon>
+                  </div>
+                  </td>
               </tr>
             </>
             )
           })}
           </table>
           </div>
-      </div>
+
         </div>
-      </div>
+     
 
   
 
